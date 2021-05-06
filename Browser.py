@@ -59,11 +59,14 @@ class Browser():
                     os.mkdir(os.path.join(destination, manga_dir))
 
                 chrome_options = ChromeOptions()
-                chrome_options.add_argument("--headless")
+                # chrome_options.add_argument("--headless")
 
                 chrome = Chrome(chrome_options=chrome_options)
 
                 for index, chapter_link in enumerate(meta["manga_chapter_links"]):
+                    if index < start:
+                        continue
+
                     print(chapter_link)
                     chapter_dir = os.path.join(manga_dir, manga_chapter_names[index])
 
@@ -74,6 +77,7 @@ class Browser():
                     page_count = len(chrome.find_elements_by_css_selector("#page-list option"))
 
                     for ix in range(1, page_count):
+                        print(f'getting { chapter_link }/{ manga_chapter_names[ix] }')
                         chrome.get(f'{ chapter_link }/{ manga_chapter_names[ix] }')
 
                         download_link = chrome.find_element_by_css_selector('.scan-page').get_attribute("src")
@@ -86,7 +90,8 @@ class Browser():
                         urllib.request.urlretrieve(download_link,
                                                    os.path.join(chapter_dir, f'{ix}.jpg'))
 
-                    break # remove after testing
+                    if index >= end:
+                        break;
 
             else:
                 print("Path is a file!")
