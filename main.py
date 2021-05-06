@@ -73,26 +73,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print("Info Updated")
         if "http://rawmangaupdate.com" in self.i_link.text():
             self.meta = self.browser.get_info(self.i_link.text())
+            manga_chapter_names = self.meta["manga_chapter_names"]
+            manga_chapter_links = self.meta["manga_chapter_links"]
 
-            self.i_name.setText(self.meta["title"])
-            self.i_chapters.setText(f'{len(self.meta["chapterLinks"])}')
+            self.i_name.setText(self.meta["manga_title"])
+            self.i_chapters.setText(f'{len(manga_chapter_links)}')
 
             self.cb_start.clear()
-            self.cb_start.addItems(self.meta["chapters"])
+            self.cb_start.addItems(manga_chapter_names)
             self.cb_start.setCurrentIndex(0)
 
             self.cb_end.clear()
-            self.cb_end.addItems(self.meta["chapters"])
-            self.cb_end.setCurrentIndex(len(self.meta["chapters"]) - 1)
+            self.cb_end.addItems(manga_chapter_names)
+            self.cb_end.setCurrentIndex(len(manga_chapter_names) - 1)
 
             self.check_if_download_possible()
 
             self.config.set("main", "link", self.i_link.text())
 
     def start_download(self):
-        self.browser.download_chapters(self.i_destination,
-                                       self.meta["chapterLinks"],
-                                       self.meta["chapterNames"],
+        self.browser.download_chapters(self.i_destination.text(),
+                                       self.meta,
                                        self.cb_start.currentIndex(),
                                        self.cb_end.currentIndex())
 
