@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 
 from Browser import Browser
 from ConfigHandler import ConfigHandler
+from PDFCreator import PDFCreator
 
 from MainWindow import Ui_MainWindow
 
@@ -24,6 +25,7 @@ class App():
 class MainWindow(QMainWindow, Ui_MainWindow):
     browser = None
     meta = {}
+    pdfcreator = PDFCreator()
     config = ConfigHandler()
 
     def __init__(self, *args, obj=None, **kwargs):
@@ -42,6 +44,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.i_link.setText(self.config.get("main", "link", fallback=""))
         self.i_destination.setText(self.config.get("main", "destination", fallback=""))
+        self.chk_create_pdf.setChecked(bool(self.config.get("main", "createPDF", fallback="False")))
 
         if not self.i_link.text() is "" and not self.i_destination.text() is "":
             self.update_info()
@@ -54,6 +57,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.i_link.textChanged.connect(self.update_info)
         self.b_destination.clicked.connect(self.set_dest)
         self.b_download.clicked.connect(self.start_download)
+        self.chk_create_pdf.clicked.connect(lambda x: self.config.set("main", "createPDF", str(self.chk_create_pdf.isChecked())))
 
     def set_dest(self):
         dialog = QFileDialog()
@@ -96,6 +100,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                        self.meta,
                                        self.cb_start.currentIndex(),
                                        self.cb_end.currentIndex())
+
+        if self.chk_create_pdf.isChecked():
+            self.pdfcreator.createPDF(os.path.join(self.i_destination.text(), self.meta["manga_title"]))
 
 
 

@@ -76,9 +76,9 @@ class Browser():
                     chrome.get(chapter_link)
                     page_count = len(chrome.find_elements_by_css_selector("#page-list option"))
 
-                    for ix in range(1, page_count):
-                        print(f'getting { chapter_link }/{ manga_chapter_names[ix] }')
-                        chrome.get(f'{ chapter_link }/{ manga_chapter_names[ix] }')
+                    for ix in range(1, page_count + 1):
+                        print(f'getting { chapter_link }/{ ix }')
+                        chrome.get(f'{ chapter_link }/{ ix }')
 
                         download_link = chrome.find_element_by_css_selector('.scan-page').get_attribute("src")
 
@@ -88,10 +88,12 @@ class Browser():
                         # filename = params["filename"]
 
                         urllib.request.urlretrieve(download_link,
-                                                   os.path.join(chapter_dir, f'{ix}.jpg'))
+                                                   os.path.join(chapter_dir, f'{ix:03}.jpg'))
 
                     if index >= end:
                         break;
+
+                chrome.close()
 
             else:
                 print("Path is a file!")
